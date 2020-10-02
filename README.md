@@ -1,2 +1,2 @@
 # Free-Throw-Assistant
-A program that computes the optimal Free Throw motion parameters for a basketball player.
+Computes the optimal Free Throw motion parameters for a basketball player.
