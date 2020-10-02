@@ -1,0 +1,7 @@
+tkinter
+Pillow
+shutil
+numpy
+sklearn
+matplotlib==3.0.3
+scipy
