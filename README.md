@@ -29,7 +29,9 @@ Example of a row:
 
 ## Using the program and interpreting the results ##
 The use of the program is intuitive and easy: select the text file with the dataset and wait for the results.
+
 Once the calculations have been finished, the optimal parameters and the shot percentage at those parameters will be shown.
+
 In addition, three plots will appear. The first one just plots the selected dataset. The second one shows the most effective range of angles. The third one is a colormap of probabilities, showing the probability of making the shot at different parameters.
 
 ## Final notes ##
