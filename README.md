@@ -24,6 +24,7 @@ The shot result is a digit: 0 (miss), 1 (make) or 2 (swish).
 Two sample datasets have been included in the extras folder.
 
 Example of a row:
+
 114.84, 126.44, 1
 
 
