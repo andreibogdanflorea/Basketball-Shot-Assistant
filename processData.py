@@ -39,7 +39,7 @@ def shiftConvexHull(X, offset_ratio):
     return points
 
 
-def findOptimalPoint(X, y, y_with_swishes, num_pts=None, y_initial=None, plot_contours=False):
+def findOptimalPoint(X, y, y_with_swishes, parameter_names, num_pts=None, y_initial=None, plot_contours=False):
     model = CalibratedClassifierCV(SVC(gamma='auto'), cv=5, method='sigmoid')
     classifier = model.fit(X, y)
 
@@ -53,7 +53,7 @@ def findOptimalPoint(X, y, y_with_swishes, num_pts=None, y_initial=None, plot_co
     probability = classifier.predict_proba(optimal_point.reshape(1, -1))
 
     if plot_contours is True:
-        fig, ax = plotData.plotPoints(X[:num_pts, :], y_initial, 'Colormap of Free Throw percentages at different angles')
+        fig, ax = plotData.plotPoints(X[:num_pts, :], y_initial, parameter_names, 'Colormap of shot probabilities at different angles')
         min_x = min(X[:num_pts, 0])
         max_x = max(X[:num_pts, 0])
         min_y = min(X[:num_pts, 1])
@@ -66,8 +66,8 @@ def findOptimalPoint(X, y, y_with_swishes, num_pts=None, y_initial=None, plot_co
         ax.set_xticks([])
         ax.set_yticks([])
         cbar = fig.colorbar(contour, ax=ax)
-        cbar.set_label('Probability of a made Free Throw')
-        ax.scatter(optimal_point[0], optimal_point[1], color='green', s=60, marker='x', label='Optimal Release Angles')
+        cbar.set_label('Probability of a made shot')
+        ax.scatter(optimal_point[0], optimal_point[1], color='green', s=60, marker='x', label='Optimal Parameteres')
         ax.annotate("{:.2f}%".format(probability[0, 1] * 100), optimal_point, color='green', size=10, xytext=(optimal_point[0] - 0.4, optimal_point[1] + 0.3))
         pyplot.legend()
         return fig, ax

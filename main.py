@@ -1,72 +1,202 @@
-import sys
-import numpy
-import plotData
-import processData
-from sklearn.svm import SVC
-from sklearn.calibration import CalibratedClassifierCV
+try:
+    import tkinter.filedialog
+    import tkinter as tk
+    from tkinter import ttk
+    import linker
+    import os
+    import shutil
+    import sklearn
+    import numpy
+    import matplotlib.pyplot
+    import scipy
+    from PIL import Image, ImageTk
+except:
+    import install_requirements
 
-def loadDataset(filename):
-    # Loading Data from file
-    print('Loading Data...')
-    data = numpy.loadtxt(open(filename, 'r'), delimiter=",")
-    X = data[:, :2]
-    y = data[:, 2]
+    import tkinter.filedialog
+    import tkinter as tk
+    from tkinter import ttk
+    import linker
+    import os
+    import shutil
+    import sklearn
+    import numpy
+    import matplotlib.pyplot
+    import scipy
+    from PIL import Image, ImageTk
 
-    return X, y
+root = tk.Tk()
+root.title('Basketball Shot Assistant')
+root.resizable(0, 0)
+root.iconbitmap('extras/icon.ico')
+bg_color = '#253E53'
+canvas = tk.Canvas(root, height=600, width=1100, bg=bg_color)
+canvas.pack()
+
+frame = tk.Frame(root, bg='white')
+frame.place(relwidth=0.9, relheight=0.9, relx=0.05, rely=0.05)
 
 
-def visualizeDataset(X, y):
-    # Visualization
-    print('Visualizing the dataset of Free Throw shots')
-    fig, ax = plotData.plotPoints(X, y, 'Dataset of Free throw shots')
+def printErrorMessage(text='Please open the shots dataset file first.'):
+    tk.messagebox.showerror(title='Error', message=text)
+
+
+def visualizeDataset(X, y, parameter_names):
+    if X.shape == (1, 1):
+        printErrorMessage()
+        return
+    fig, ax = linker.visualizeDataset(X, y, parameter_names)
+    return fig, ax
+
+def visualizeDecisionBoundary(classifier, X, y, y_with_swishes, parameter_names):
+    if X.shape == (1, 1):
+        printErrorMessage()
+        return
+    fig, ax = linker.visualizeDecisionBoundary(classifier, X, y, y_with_swishes, parameter_names)
+
     return fig, ax
 
 
-def normalizeFeatures_addConvexHullPoints(X, y):
-    # Feature normalization and addition of "reference" misses (at abnormal angles)
-    print('Normalizing features and adding reference misses at abnormal angles')
-    X_norm, mu, std = processData.featureNormalization(X)
-
-    # offset ratio to shift the convex hull points from the centroid with
-    offset_ratio = 1.5
-    points_to_add = processData.shiftConvexHull(X_norm, offset_ratio)
-
-    # add those points to the dataset as misses, they are "abnormal" and are most likely misses
-    X_norm = numpy.append(X_norm, points_to_add, axis=0)
-    y = numpy.append(y, numpy.zeros(len(points_to_add)), axis=0)
-    y_with_swishes = y.copy()
-    y[y == 2] = 1
-
-    return X_norm, y, mu, std, y_with_swishes
-
-
-def trainModel(X, y):
-    # Training the model
-    print('Training the model')
-    model = CalibratedClassifierCV(SVC(gamma='auto'), cv=5, method='sigmoid')
-    classifier = model.fit(X, y)
-
-    return classifier
-
-
-def visualizeDecisionBoundary(classifier, X, num_pts, y_with_swishes):
-    print('Visualizing the decision boundary for predicting a made or missed Free Throw shot')
-    fig, ax = plotData.visualizeDecisionBoundary(classifier, X, num_pts, y_with_swishes)
+def visualizeColormap(X, y, y_with_swishes, num_pts, y_initial, parameter_names):
+    if X.shape == (1, 1):
+        printErrorMessage()
+        return
+    fig, ax = linker.visualizeColormap(X, y, y_with_swishes, num_pts, y_initial, parameter_names)
 
     return fig, ax
 
 
-def optimalParameters(X, y, y_with_swishes, mu, std):
-    # Calculating the optimal release angles
-    print('Calculating the optimal release angles')
-    optimal_point, probability = processData.findOptimalPoint(X, y, y_with_swishes, plot_contours=False)
-    optimal_parameters = optimal_point * std + mu
+def printOptimalParameters(X, y, y_with_swishes, parameter_names, mu, std):
+    if X.shape == (1, 1):
+        printErrorMessage()
+        return
+    optimal_parameters, probability = linker.optimalParameters(X, y, y_with_swishes, parameter_names, mu, std)
 
-    return optimal_parameters, probability
+    text = 'Optimal Parameters\n{}: {:.2f}\n{}: {:.2f}\n\nShot percentage\nat those parameters: {:.2f}%'
+    optimal_parameters_message = tk.Message(frame,
+                                            text=text.format(parameter_names[0], optimal_parameters[0], parameter_names[1], optimal_parameters[1], probability[0][1] * 100),
+                                            justify='left', width=200, fg='white', bg=bg_color)
+    optimal_parameters_message.place(relx=0.08, rely=0.765)
 
-def visualizeColormap(X, y, y_with_swishes, num_pts, y_initial):
-    # Visualizing Colormap of Free Throw probabilities at different angles
-    print('Visualizing Colormap of Free Throw probabilities at different angles')
-    fig, ax = processData.findOptimalPoint(X, y, y_with_swishes, num_pts, y_initial, plot_contours=True)
 
-    return fig, ax
+def quitProtocol():
+    if os.path.exists('extras/Plots'):
+        shutil.rmtree('extras/Plots')
+    root.quit()
+
+def forward_button(image_number):
+    global image_list, image_label, button_forward, button_back
+    image_label.place_forget()
+    image_label = tk.Label(frame, image=image_list[image_number - 1])
+    image_label.image = image_list[image_number - 1]
+    image_label.place(relx=0.31, rely=0.02)
+    button_back = tk.Button(frame, text='<<', fg='white', bg=bg_color, width=5, command=lambda: back_button(image_number - 1))
+    button_forward = tk.Button(frame, text='>>', fg='white', bg=bg_color, width=5, command=lambda: forward_button(image_number + 1))
+
+    if image_number == len(image_list):
+        button_forward = tk.Button(frame, text='>>', fg='white', bg=bg_color, width=5, state=tk.DISABLED)
+
+    button_back.place(relx=0.53, rely=0.95)
+    button_forward.place(relx=0.735, rely=0.95)
+
+
+def back_button(image_number):
+    global image_list, image_label, button_forward, button_back
+    image_label.place_forget()
+    image_label = tk.Label(frame, image=image_list[image_number - 1])
+    image_label.image = image_list[image_number - 1]
+    image_label.place(relx=0.31, rely=0.02)
+    button_back = tk.Button(frame, text='<<', fg='white', bg=bg_color, width=5,
+                            command=lambda: back_button(image_number - 1))
+    button_forward = tk.Button(frame, text='>>', fg='white', bg=bg_color, width=5,
+                               command=lambda: forward_button(image_number + 1))
+
+    if image_number == 1:
+        button_back = tk.Button(frame, text='<<', fg='white', bg=bg_color, width=5, state=tk.DISABLED)
+
+    button_back.place(relx=0.53, rely=0.95)
+    button_forward.place(relx=0.735, rely=0.95)
+
+
+def openFileDialog():
+    filename = tk.filedialog.askopenfilename(initialdir="/", title='Select Dataset File',
+                                          filetypes=(('Text Files', '*.txt'), ('CSV Files', '*.csv')))
+
+    if filename == '':
+        return
+
+    try:
+        X, y, parameter_names = linker.loadDataset(filename)
+    except:
+        printErrorMessage('The selected file does follow the format specified in the README file.')
+        return
+
+    X_norm, y_norm, mu, std, y_with_swishes = linker.normalizeFeatures_addConvexHullPoints(X, y)
+    classifier = linker.trainModel(X_norm, y_norm)
+
+    if os.path.exists('extras/Plots'):
+        shutil.rmtree('extras/Plots')
+    if not os.path.exists('extras/Plots'):
+        os.makedirs('extras/Plots')
+
+    progress = ttk.Progressbar(frame, orient=tk.HORIZONTAL, length=160, mode='determinate')
+    progress.place(relx=0.08, rely=0.3)
+
+
+    fig, ax = visualizeDataset(X, y, parameter_names)
+    fig.savefig('extras/Plots/1.png')
+    fig.clear()
+    progress['value'] = 25
+    root.update_idletasks()
+
+    fig, ax = visualizeDecisionBoundary(classifier, X_norm, len(X), y, parameter_names)
+    fig.savefig('extras/Plots/2.png')
+    fig.clear()
+    progress['value'] = 50
+    root.update_idletasks()
+
+    fig, ax = visualizeColormap(X_norm, y_norm, y_with_swishes, len(X), y, parameter_names)
+    fig.savefig('extras/Plots/3.png')
+    fig.clear()
+    progress['value'] = 75
+    root.update_idletasks()
+
+    printOptimalParameters(X_norm, y_norm, y_with_swishes, parameter_names, mu, std)
+    progress['value'] = 100
+    root.update_idletasks()
+
+    progress.destroy()
+
+    image1 = ImageTk.PhotoImage(Image.open('extras/Plots/1.png').resize((667, 500)))
+    image2 = ImageTk.PhotoImage(Image.open('extras/Plots/2.png').resize((667, 500)))
+    image3 = ImageTk.PhotoImage(Image.open('extras/Plots/3.png').resize((667, 500)))
+
+    global image_list
+    image_list = [image1, image2, image3]
+
+    global image_label
+
+    first_page_image.destroy()
+    image_label = tk.Label(frame, image=image1)
+    image_label.image = image1
+    image_label.place(relx=0.31, rely=0.02)
+
+    global button_back, button_forward
+    button_back = tk.Button(frame, text='<<', fg='white', bg=bg_color, width=5, state=tk.DISABLED)
+    button_forward = tk.Button(frame, text='>>', fg='white', bg=bg_color, width=5, command=lambda: forward_button(2))
+    button_back.place(relx=0.53, rely=0.95)
+    button_forward.place(relx=0.735, rely=0.95)
+
+
+image = ImageTk.PhotoImage(Image.open('extras/first_page.jpg').resize((667, 500)))
+first_page_image = tk.Label(frame, image=image)
+first_page_image.imge = image
+first_page_image.place(relx=0.31, rely=0.02)
+
+openFile = tk.Button(frame, text='Open File', padx=10, pady=5, fg='white', bg=bg_color,
+                     command=openFileDialog, width=19)
+openFile.place(relx=0.08, rely=0.2)
+
+
+root.protocol("WM_DELETE_WINDOW", quitProtocol)
+root.mainloop()

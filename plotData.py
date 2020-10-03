@@ -2,15 +2,15 @@ import numpy
 import matplotlib.pyplot as pyplot
 from matplotlib import colors
 
-def plotPoints(X, y, title='Figure'):
+def plotPoints(X, y, parameter_names, title='Figure'):
     swishes = numpy.where(y == 2)
     makes = numpy.where(y == 1)
     misses = numpy.where(y == 0)
 
     fig, ax = pyplot.subplots(num=title)
     fig.set_size_inches(8, 6)
-    pyplot.xlabel("Body-Arm angle")
-    pyplot.ylabel("Elbow angle")
+    pyplot.xlabel(parameter_names[0])
+    pyplot.ylabel(parameter_names[1])
 
     if title is not 'Figure':
         pyplot.title(title)
@@ -40,8 +40,8 @@ def plot_contours(ax, classifier, xx, yy, **params):
     return out
 
 
-def visualizeDecisionBoundary(classifier, X, num_pts, y_initial):
-    title = ('Decision Boundary - shows angles that result in the highest Free Throw Percentage')
+def visualizeDecisionBoundary(classifier, X, num_pts, y_initial, parameter_names):
+    title = ('Decision Boundary - shows angles that result in the highest shot percentage')
     fig, ax = plotPoints(X[:num_pts, :], y_initial, title)
 
     min_x = min(X[:num_pts, 0])
@@ -56,8 +56,8 @@ def visualizeDecisionBoundary(classifier, X, num_pts, y_initial):
     colormap = colors.ListedColormap(['w', 'k', 'b'])
     plot_contours(ax, classifier, xx, yy, cmap=colormap, alpha=0.3)
 
-    ax.set_ylabel('Elbow angle')
-    ax.set_xlabel('Body-Arm angle')
+    ax.set_xlabel(parameter_names[0])
+    ax.set_ylabel(parameter_names[1])
     ax.set_xticks([])
     ax.set_yticks([])
     ax.set_title(title)
