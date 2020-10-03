@@ -2,7 +2,7 @@
   <h1>Basketball Shot Assistant</h1>
   <h3>Computes the optimal Shooting motion parameters</h3>
 </div>
-
+<br/>
 
 
 ## Collecting the necessary data ##
