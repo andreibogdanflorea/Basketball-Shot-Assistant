@@ -1,4 +1,4 @@
-<div align="center">
+<div align="left">
   <h1>Basketball Shot Assistant</h1>
   <h3>Computes the optimal Shooting motion parameters</h3>
 </div>
