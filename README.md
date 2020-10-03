@@ -36,6 +36,6 @@ Once the calculations have been finished, the optimal parameters and the shot pe
 In addition, three plots will appear. The first one just plots the selected dataset. The second one shows the most effective range of angles. The third one is a colormap of probabilities, showing the probability of making the shot at different parameters.
 
 ## Final notes ##
-My intent is to keep working on the application and expand to more than the two parameters mentioned. 
+My intent is to keep working on the application and expand to more than the two mentioned parameters. 
 
 Support is greatly appreciated!
