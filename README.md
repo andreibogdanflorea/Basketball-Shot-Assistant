@@ -19,7 +19,8 @@ Examples of shooting motion parameters: body-arm angle, elbow angle, angle of kn
 2) The shots in a dataset must be taken from the same spot on the basketball floor.
 
 3) For the effectiveness of the program, the dataset must consist of at least around 50 shots. Having a larger dataset improves the prediction.
-<br/>
+<br>
+
 
 ## Storing the acquired data ##
 The data must be stored in a text file, in CSV file format (without the header row). A row stands for the parameters of a shot: [parameter1],[parameter2],[shot result].
@@ -31,7 +32,8 @@ Two sample datasets have been included in the extras folder.
 Example of a row in the dataset:
 
 114.84,126.44,1
-<br/>
+<br><br><br>
+
 
 ## Using the program and interpreting the results ##
 The use of the program is intuitive and easy: select the text file with the dataset and wait for the results.
@@ -39,7 +41,8 @@ The use of the program is intuitive and easy: select the text file with the data
 Once the calculations have been finished, the optimal parameters and the shot percentage at those parameters will be shown.
 
 In addition, three plots will appear. The first one just plots the selected dataset. The second one shows the most effective range of parameters. The third one is a colormap of probabilities, showing the probability of making the shot at different parameters.
-<br/>
+<br><br><br>
+
 
 ## Final notes ##
 My intent is to keep working on the application and expand to more than the two mentioned parameters.
