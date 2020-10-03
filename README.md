@@ -25,7 +25,7 @@ Two sample datasets have been included in the extras folder.
 
 Example of a row:
 
-114.84, 126.44, 1
+114.84,126.44,1
 
 
 ## Using the program and interpreting the results ##
