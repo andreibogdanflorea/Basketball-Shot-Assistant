@@ -1,6 +1,7 @@
 <div align="center">
   <h1>Basketball Shot Assistant</h1>
   <h3>Computes the optimal Shooting motion parameters</h3>
+</div>
 
 ## Collecting the necessary data ##
 This application requires collecting data from a significant sample size of shots by a basketball player.
